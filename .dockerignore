@@ -1,0 +1,10 @@
+node_modules
+.git
+.env*
+!.env.production.example
+.wrangler
+.venv
+__pycache__
+*.db
+secrets
+dist

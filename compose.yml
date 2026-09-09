@@ -1,0 +1,66 @@
+name: bob
+services:
+  postgres:
+    image: postgres:18-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: bob
+      POSTGRES_DB: bob
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set a dedicated Bob database password}
+    volumes:
+      - bob-postgres:/var/lib/postgresql
+    healthcheck:
+      test: [CMD-SHELL, 'pg_isready -U bob -d bob']
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    networks: [bob]
+  app:
+    build: .
+    image: bob:local
+    restart: unless-stopped
+    env_file: .env.production
+    environment:
+      DATABASE_URL: postgresql+psycopg://bob:${POSTGRES_PASSWORD}@postgres:5432/bob
+      BOB_ENCRYPTION_KEY_FILE: /run/secrets/bob_key
+      BOB_SECRETS_FILE: /run/secrets/bob_credentials
+    secrets: [bob_key, bob_credentials]
+    ports: ['127.0.0.1:${BOB_PORT:-3080}:8000']
+    depends_on:
+      postgres: {condition: service_healthy}
+    read_only: true
+    tmpfs: [/tmp]
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    healthcheck:
+      test: [CMD, python, -c, "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/health')"]
+      interval: 20s
+      timeout: 5s
+      retries: 5
+    networks: [bob]
+  worker:
+    image: bob:local
+    restart: unless-stopped
+    command: [python, worker.py]
+    env_file: .env.production
+    environment:
+      DATABASE_URL: postgresql+psycopg://bob:${POSTGRES_PASSWORD}@postgres:5432/bob
+      BOB_ENCRYPTION_KEY_FILE: /run/secrets/bob_key
+      BOB_SECRETS_FILE: /run/secrets/bob_credentials
+    secrets: [bob_key, bob_credentials]
+    depends_on:
+      app: {condition: service_healthy}
+    read_only: true
+    tmpfs: [/tmp]
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    networks: [bob]
+secrets:
+  bob_key:
+    file: ${BOB_KEY_FILE:?Set path to the separately stored encryption key}
+  bob_credentials:
+    file: ${BOB_CREDENTIALS_FILE:?Set path to the encrypted credential bundle}
+volumes:
+  bob-postgres:
+networks:
+  bob:
