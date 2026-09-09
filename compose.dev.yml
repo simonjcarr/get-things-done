@@ -1,0 +1,47 @@
+name: bob-dev
+services:
+  postgres:
+    image: postgres:18-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: bob
+      POSTGRES_DB: bob
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD}
+    volumes:
+      - postgres-dev:/var/lib/postgresql
+    healthcheck:
+      test: [CMD-SHELL, 'pg_isready -U bob -d bob']
+      interval: 3s
+      timeout: 3s
+      retries: 20
+  api:
+    image: bob:mvp
+    build: .
+    restart: unless-stopped
+    command: [uvicorn, 'main:app', --host, '0.0.0.0', --port, '8000', --reload, --no-access-log]
+    env_file: .env.development
+    environment:
+      DATABASE_URL: postgresql+psycopg://bob:${POSTGRES_PASSWORD}@postgres:5432/bob
+    volumes:
+      - ./backend:/app:ro
+    ports: ['127.0.0.1:8000:8000']
+    healthcheck:
+      test: [CMD, python, -c, "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/health')"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+    depends_on:
+      postgres: {condition: service_healthy}
+  worker:
+    image: bob:mvp
+    restart: unless-stopped
+    command: [python, worker.py]
+    env_file: .env.development
+    environment:
+      DATABASE_URL: postgresql+psycopg://bob:${POSTGRES_PASSWORD}@postgres:5432/bob
+    volumes:
+      - ./backend:/app:ro
+    depends_on:
+      api: {condition: service_healthy}
+volumes:
+  postgres-dev:
