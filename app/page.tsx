@@ -1,3 +1,4 @@
+import { createId } from '@/lib/id';
 import { useEffect, useState } from 'react';
 import {
   Activity,
@@ -244,7 +245,7 @@ export default function Home() {
                   ),
                   events: [
                     {
-                      id: crypto.randomUUID(),
+                      id: createId(),
                       title:
                         action === 'reject'
                           ? 'Draft rejected'

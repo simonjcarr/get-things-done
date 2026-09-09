@@ -1,3 +1,4 @@
+import { createId } from './id';
 export type Event = {
   id: string;
   title: string;
@@ -66,7 +67,7 @@ export type Project = {
   demo?: boolean;
 };
 export function newProject(objective: string): Project {
-  const id = crypto.randomUUID(),
+  const id = createId(),
     at = new Date().toISOString();
   return {
     id,
@@ -85,7 +86,7 @@ export function newProject(objective: string): Project {
     createdAt: at,
     actions: [
       {
-        id: crypto.randomUUID(),
+        id: createId(),
         title: 'Investigate the objective',
         detail:
           'Resolve location and context from public sources, identify responsible stakeholders, and record evidence with source URLs.',
@@ -93,7 +94,7 @@ export function newProject(objective: string): Project {
         priority: 'High',
       },
       {
-        id: crypto.randomUUID(),
+        id: createId(),
         title: 'Develop and challenge the strategy',
         detail:
           'Use verified evidence to propose a plan and review its assumptions before contacting anyone.',
@@ -103,7 +104,7 @@ export function newProject(objective: string): Project {
     ],
     events: [
       {
-        id: crypto.randomUUID(),
+        id: createId(),
         title: 'Project created',
         detail: 'Objective saved. Investigation is waiting for provider setup.',
         at,
