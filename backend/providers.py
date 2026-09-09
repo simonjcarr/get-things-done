@@ -32,6 +32,8 @@ class Providers:
             POLICY
             + "\nRole: "
             + role
+            + "\nPermitted public postal address (empty means not configured): "
+            + os.getenv("BOB_PUBLIC_ADDRESS", "")
             + "\nOutput schema: "
             + json.dumps(schema.model_json_schema())
         )

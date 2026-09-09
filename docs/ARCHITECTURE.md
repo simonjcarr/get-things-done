@@ -4,7 +4,7 @@ Bob is a persistent project system. Models propose typed actions; trusted applic
 
 ## 1. System architecture
 
-The hosted web surface uses React and TypeScript. Production is the existing carrtech.dev server, ctlnxdbn001, using a separate Docker Compose stack. A dedicated FastAPI service owns PostgreSQL records and a durable PostgreSQL job queue (leased rows with retry schedules). Separate worker processes run research, planning and mailbox polling without an open browser. SMTP and IMAP remain backend adapters, never model tools. Docker Compose provides the initial deployment. The hosted UI can be developed independently of the service; demo records must be labelled and may never be represented as real research or correspondence.
+The hosted web surface uses React and TypeScript. Production is the existing carrtech.dev server, the existing production host, using a separate Docker Compose stack. A dedicated FastAPI service owns PostgreSQL records and a durable PostgreSQL job queue (leased rows with retry schedules). Separate worker processes run research, planning and mailbox polling without an open browser. SMTP and IMAP remain backend adapters, never model tools. Docker Compose provides the initial deployment. The hosted UI can be developed independently of the service; demo records must be labelled and may never be represented as real research or correspondence.
 
 ```mermaid
 flowchart LR

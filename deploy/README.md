@@ -1,6 +1,6 @@
 # Deployment on the carrtech.dev production box
 
-Target: `ctlnxdbn001`, beside the existing CarrTech stack. Bob is a separate Compose project (`bob`), database, volume, network and loopback port (3080). Do not alter CarrTech's database, runner, network or production configuration to deploy Bob.
+Target: `the existing production host`, beside the existing CarrTech stack. Bob is a separate Compose project (`bob`), database, volume, network and loopback port (3080). Do not alter CarrTech's database, runner, network or production configuration to deploy Bob.
 
 Proposed hostname: `bob.carrtech.dev` (must be confirmed and added to the existing tunnel routing). Do not publish the app port directly to the internet. The production origin must match `BOB_ORIGIN` exactly for authenticated writes.
 
